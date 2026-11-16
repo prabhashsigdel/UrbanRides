@@ -1,24 +1,36 @@
-# Reference copy of the old project (never commit)
-_original/
-
-# Dependencies
-node_modules/
+# AI tooling (never commit)
+CLAUDE.md
+.claude/
+.cursor/
+.agents/
+.skills/
 
 # Secrets
 .env
 .env.*
 !.env.example
 
-# Uploaded vehicle images
-backend/uploads/
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+__pycache__/
+*.pyc
+.venv/
+venv/
 
-# Logs / OS
-*.log
+# Editor and OS junk
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
 
-# Build output / editors
-dist/
-coverage/
-.vscode/
-.idea/
+# Logs and local data
+*.log
+
+# Project-specific
+# Reference copy of the old project (never commit)
+_original/
+# Uploaded vehicle images
+backend/uploads/
