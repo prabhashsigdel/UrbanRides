@@ -43,7 +43,7 @@ const login = async (req, res) => {
         );
         console.log("Generated Token:", token); 
 
-        res.status(200).json({ message: "Login successful", success: true, token, isAdmin: user.isAdmin });
+        res.status(200).json({ message: "Login successful", success: true, token, name: user.name, isAdmin: user.isAdmin });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error!", success: false });

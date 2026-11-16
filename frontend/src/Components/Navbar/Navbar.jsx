@@ -57,7 +57,7 @@ function Navbar() {
         ) : (
           <li className="nav-item profile-menu" onClick={toggleProfileDropdown}>
             <span className="nav-links">
-              <i className="fas fa-user"></i> {isAdmin ? "Admin" : user?.name}
+              {isAdmin ? "Admin" : user?.name || "Account"} ▾
             </span>
             {profileDropdown && (
               <ul className="profile-dropdown">
