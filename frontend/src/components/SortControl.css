@@ -1,0 +1,117 @@
+.sort-control {
+  position: relative;
+  z-index: 5;
+}
+
+.sort-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-press) var(--ease-out);
+}
+
+.sort-trigger:active {
+  transform: scale(0.97);
+}
+
+.sort-trigger[aria-expanded="true"] {
+  border-color: var(--color-ink-faint);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sort-trigger:hover {
+    box-shadow: var(--shadow-raised);
+  }
+}
+
+.sort-chevron {
+  margin-left: var(--space-1);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.sort-trigger[aria-expanded="true"] .sort-chevron {
+  transform: rotate(180deg);
+}
+
+/* Same open/close motion as the account menu */
+.sort-menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: var(--space-2);
+  list-style: none;
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-pop);
+  transform-origin: top right;
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
+  visibility: hidden;
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 140ms var(--ease-out),
+    visibility 0s linear 140ms;
+}
+
+.sort-menu[data-open="true"] {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.sort-menu [role="option"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sort-menu [role="option"][data-active="true"] {
+  background: var(--color-surface);
+}
+
+.sort-menu [role="option"][aria-selected="true"] {
+  font-weight: 700;
+}
+
+.sort-check {
+  color: var(--color-accent);
+  visibility: hidden;
+}
+
+.sort-menu [aria-selected="true"] .sort-check {
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sort-menu,
+  .sort-menu[data-open="true"],
+  .sort-chevron {
+    transition: none;
+  }
+}

@@ -1,36 +1,17 @@
 import { useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowUpDown, CarFront, RefreshCw } from "lucide-react";
+import { CarFront, RefreshCw } from "lucide-react";
 import SearchBar from "../components/SearchBar";
 import VehicleGrid from "../components/VehicleGrid";
 import StateBlock from "../components/StateBlock";
+import SortControl from "../components/SortControl";
+import { parseSort, sortVehicles } from "../lib/sort";
 import { useVehicles } from "../hooks/useVehicles";
 import { formatDate, rentalDays } from "../lib/format";
 import "./Vehicles.css";
 
 const TITLES = { car: "Cars for rent", bike: "Bikes for rent", "": "All vehicles" };
 const PATHS = { car: "/cars", bike: "/bikes", "": "/vehicles" };
-
-const isAvailable = (v) => v.available !== false;
-
-const SORTS = [
-  { value: "", label: "Recommended" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
-  { value: "name", label: "Name: A to Z" },
-];
-
-/** Available vehicles first, then by the chosen order. */
-function sortVehicles(list, sort) {
-  const byAvailability = (a, b) => Number(isAvailable(b)) - Number(isAvailable(a));
-  const comparators = {
-    "price-asc": (a, b) => Number(a.pricePerDay) - Number(b.pricePerDay),
-    "price-desc": (a, b) => Number(b.pricePerDay) - Number(a.pricePerDay),
-    name: (a, b) => a.model.localeCompare(b.model),
-  };
-  const compare = comparators[sort];
-  return [...list].sort((a, b) => byAvailability(a, b) || (compare ? compare(a, b) : 0));
-}
 
 /** Fleet listing. `fixedType` comes from the /cars and /bikes routes; otherwise ?type= decides. */
 export default function Vehicles({ fixedType }) {
@@ -42,7 +23,7 @@ export default function Vehicles({ fixedType }) {
   const type = fixedType ?? params.get("type") ?? "";
   const from = params.get("from") ?? "";
   const to = params.get("to") ?? "";
-  const sort = SORTS.some((s) => s.value === params.get("sort")) ? params.get("sort") : "";
+  const sort = parseSort(params.get("sort"));
   const days = rentalDays(from, to);
 
   // Dates travel on to the booking page; sort only matters here.
@@ -93,17 +74,7 @@ export default function Vehicles({ fixedType }) {
                 : countLabel || " "}
             </p>
           </div>
-          <label className="sort-control">
-            <ArrowUpDown size={16} aria-hidden="true" />
-            <span className="visually-hidden">Sort vehicles</span>
-            <select value={sort} onChange={(e) => navigateWith({ nextSort: e.target.value })}>
-              {SORTS.map((option) => (
-                <option key={option.value || "recommended"} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SortControl value={sort} onChange={(nextSort) => navigateWith({ nextSort })} />
         </div>
 
         {status === "error" ? (

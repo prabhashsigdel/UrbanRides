@@ -5,9 +5,9 @@ import "./VehicleGrid.css";
 
 const SKELETON_COUNT = 8;
 
-function GridSkeleton() {
+function GridSkeleton({ className }) {
   return (
-    <ul className="vehicle-grid" aria-hidden="true">
+    <ul className={`vehicle-grid ${className}`} aria-hidden="true">
       {Array.from({ length: SKELETON_COUNT }, (_, i) => (
         <li key={i} className="vehicle-skeleton">
           <div className="skeleton-photo" />
@@ -23,7 +23,7 @@ function GridSkeleton() {
  * Fleet grid. Parents call ref.captureLayout() right before changing `vehicles`
  * (e.g. switching Cars/Bikes) so the cards glide to their new places.
  */
-const VehicleGrid = forwardRef(function VehicleGrid({ vehicles, status, search = "", empty }, ref) {
+const VehicleGrid = forwardRef(function VehicleGrid({ vehicles, status, search = "", empty, className = "" }, ref) {
   const listRef = useRef(null);
   const flipState = useRef(null);
   const hasEntered = useRef(false);
@@ -53,7 +53,8 @@ const VehicleGrid = forwardRef(function VehicleGrid({ vehicles, status, search =
     { dependencies: [status] },
   );
 
-  // Filter changes: cards that stay glide to their new slot, new ones fade up.
+  // Sort or filter changes: cards that stay glide to their new slot, new ones fade up.
+  // Transform-only (no `absolute`) so the grid keeps its height and cards never leave it.
   const key = vehicles.map((v) => v._id).join(",");
   useLayoutEffect(() => {
     const state = flipState.current;
@@ -63,18 +64,17 @@ const VehicleGrid = forwardRef(function VehicleGrid({ vehicles, status, search =
       targets: listRef.current.querySelectorAll(".vehicle-card"),
       duration: 0.5,
       ease: "power3.inOut",
-      absolute: true,
       onEnter: (elements) =>
         gsap.fromTo(elements, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE_OUT, stagger: 0.03 }),
     });
     return () => flip.progress(1).kill();
   }, [key]);
 
-  if (status === "loading") return <GridSkeleton />;
+  if (status === "loading") return <GridSkeleton className={className} />;
   if (vehicles.length === 0) return empty;
 
   return (
-    <ul className="vehicle-grid" ref={listRef}>
+    <ul className={`vehicle-grid ${className}`} ref={listRef}>
       {vehicles.map((vehicle) => (
         <VehicleCard key={vehicle._id} vehicle={vehicle} search={search} />
       ))}

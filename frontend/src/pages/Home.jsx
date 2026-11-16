@@ -4,7 +4,8 @@ import { ArrowRight, CarFront, RefreshCw } from "lucide-react";
 import SearchBar from "../components/SearchBar";
 import VehicleGrid from "../components/VehicleGrid";
 import StateBlock from "../components/StateBlock";
-import TypeTabs from "../components/TypeTabs";
+import SortControl from "../components/SortControl";
+import { sortVehicles } from "../lib/sort";
 import { useVehicles } from "../hooks/useVehicles";
 import { EASE_OUT, gsap, prefersReducedMotion, useGSAP } from "../lib/motion";
 import "./Home.css";
@@ -25,7 +26,7 @@ export default function Home() {
   const heroRef = useRef(null);
   const gridRef = useRef(null);
   const { vehicles, status, error, reload } = useVehicles();
-  const [type, setType] = useState("");
+  const [sort, setSort] = useState("");
 
   useGSAP(
     () => {
@@ -42,14 +43,11 @@ export default function Home() {
     { scope: heroRef },
   );
 
-  const shown = useMemo(
-    () => vehicles.filter((v) => !type || v.type === type).slice(0, PREVIEW_COUNT),
-    [vehicles, type],
-  );
+  const shown = useMemo(() => sortVehicles(vehicles, sort).slice(0, PREVIEW_COUNT), [vehicles, sort]);
 
-  const handleTypeChange = (next) => {
+  const handleSortChange = (next) => {
     gridRef.current?.captureLayout();
-    setType(next);
+    setSort(next);
   };
 
   return (
@@ -70,7 +68,7 @@ export default function Home() {
       <section className="fleet container" aria-labelledby="fleet-heading">
         <div className="fleet-header">
           <h2 id="fleet-heading">Browse the fleet</h2>
-          <TypeTabs value={type} onChange={handleTypeChange} />
+          <SortControl value={sort} onChange={handleSortChange} />
         </div>
 
         {status === "error" ? (
@@ -88,11 +86,12 @@ export default function Home() {
         ) : (
           <VehicleGrid
             ref={gridRef}
+            className="vehicle-grid-preview"
             vehicles={shown}
             status={status}
             empty={
               <StateBlock icon={CarFront} title="No vehicles listed yet">
-                {type ? "Nothing in this category right now. Try another type." : "Check back soon, the fleet is being added."}
+                Check back soon, the fleet is being added.
               </StateBlock>
             }
           />
@@ -100,7 +99,7 @@ export default function Home() {
 
         {status === "ready" && vehicles.length > 0 && (
           <div className="fleet-footer">
-            <Link to={`/vehicles${type ? `?type=${type}` : ""}`} className="btn btn-secondary">
+            <Link to={`/vehicles${sort ? `?sort=${sort}` : ""}`} className="btn btn-secondary">
               See all vehicles <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>

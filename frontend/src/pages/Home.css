@@ -28,10 +28,12 @@
   padding-bottom: var(--space-8);
 }
 
+/* Heading on the left, sort on the right; they stack on narrow screens */
 .fleet-header {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
