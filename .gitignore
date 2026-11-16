@@ -1,0 +1,17 @@
+# Reference copy of the old project (never commit)
+_original/
+
+# Dependencies
+node_modules/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Uploaded vehicle images
+backend/uploads/
+
+# Logs / OS
+*.log
+.DS_Store
