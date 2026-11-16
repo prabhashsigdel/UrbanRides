@@ -34,3 +34,6 @@ Thumbs.db
 _original/
 # Uploaded vehicle images
 backend/uploads/
+
+# Design tooling (AI-assisted design workspace)
+.impeccable/

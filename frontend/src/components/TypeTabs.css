@@ -1,0 +1,43 @@
+.type-tabs {
+  position: relative;
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+}
+
+.type-tab {
+  position: relative;
+  z-index: 1;
+  height: 40px;
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.type-tab[aria-selected="true"] {
+  color: var(--color-bg);
+}
+
+.type-tab:focus-visible {
+  outline-offset: 3px;
+}
+
+/* Sliding pill behind the selected option, positioned by GSAP */
+.type-tabs-indicator {
+  position: absolute;
+  top: var(--space-1);
+  left: 0;
+  height: 40px;
+  width: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+}

@@ -1,0 +1,279 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-bg-translucent);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.nav[data-scrolled="true"] {
+  border-bottom-color: var(--color-line);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  height: var(--nav-height);
+}
+
+.wordmark {
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  color: var(--color-ink);
+}
+
+.wordmark span {
+  color: var(--color-accent);
+}
+
+.nav-links {
+  position: relative;
+  display: flex;
+  gap: var(--space-1);
+  margin: 0 0 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+/* Shared hover pill, positioned by GSAP in Navbar.jsx */
+.nav-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-strong);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-link.active {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Account menu */
+.account {
+  position: relative;
+}
+
+.account-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 44px;
+  padding: 0 var(--space-3) 0 var(--space-1);
+  background: var(--color-bg);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-press) var(--ease-out);
+}
+
+.account-trigger:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .account-trigger:hover {
+    box-shadow: var(--shadow-raised);
+  }
+}
+
+.account-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-bg);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.account-name {
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 220px;
+  padding: var(--space-2);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-pop);
+  transform-origin: top right;
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
+  visibility: hidden;
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 140ms var(--ease-out),
+    visibility 0s linear 140ms;
+}
+
+.account-menu[data-open="true"] {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.account-menu a,
+.account-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  font-size: var(--text-base);
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.account-menu a:hover,
+.account-menu button:hover,
+.account-menu a:focus-visible,
+.account-menu button:focus-visible {
+  background: var(--color-surface);
+}
+
+/* Mobile */
+.nav-toggle {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  cursor: pointer;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .nav-links,
+  .nav-actions {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: grid;
+  }
+
+  .mobile-menu {
+    display: block;
+    position: fixed;
+    inset: var(--nav-height) 0 0 0;
+    padding: var(--space-4) var(--gutter) var(--space-6);
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-line);
+    overflow-y: auto;
+  }
+
+  .mobile-menu[hidden] {
+    display: none;
+  }
+
+  .mobile-menu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mobile-link {
+    display: block;
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--color-line);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .mobile-link.active {
+    color: var(--color-accent);
+  }
+
+  .mobile-actions {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .mobile-actions .account-menu {
+    position: static;
+    margin-top: var(--space-2);
+    box-shadow: none;
+    border: 1px solid var(--color-line);
+  }
+
+  .mobile-actions .account-menu:not([data-open="true"]) {
+    display: none;
+  }
+}
+
+/* Theme toggle: one in the desktop actions, one beside the mobile menu button */
+.theme-toggle-mobile {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .theme-toggle-mobile {
+    display: grid;
+    margin-left: auto;
+  }
+
+  .nav-toggle {
+    margin-left: var(--space-2);
+  }
+}

@@ -1,0 +1,123 @@
+:root {
+  color-scheme: light;
+
+  /* Color (light) */
+  --color-bg: #ffffff;
+  --color-bg-translucent: rgba(255, 255, 255, 0.96);
+  --color-surface: #f6f7f6;
+  --color-surface-strong: #eceeec;
+  --color-ink: #1b1f1e;
+  --color-ink-muted: #3d4441;
+  --color-ink-faint: #7a827f;
+  --color-line: #e2e5e3;
+  --color-line-strong: #c9cecb;
+  --color-accent: #0e6b59;
+  --color-accent-hover: #0a5546;
+  --color-accent-soft: #e5f1ee;
+  --color-on-accent: #ffffff;
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecea;
+  --color-success: #12704a;
+  --shadow-raised: 0 6px 20px rgba(17, 24, 22, 0.08), 0 1px 3px rgba(17, 24, 22, 0.06);
+  --shadow-pop: 0 12px 32px rgba(17, 24, 22, 0.14);
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%231b1f1e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+
+  /* Type */
+  --font-sans: "Figtree Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: clamp(1.625rem, 1.3rem + 1.2vw, 2.125rem);
+  --text-hero: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);
+
+  /* Space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  --content-max: 1360px;
+
+  /* Shape */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --duration-press: 140ms;
+  --duration-fast: 180ms;
+
+  --nav-height: 76px;
+}
+
+/* Dark palette: follows the system unless the visitor picked light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-bg: #121514;
+    --color-bg-translucent: rgba(18, 21, 20, 0.94);
+    --color-surface: #1b1f1e;
+    --color-surface-strong: #262b29;
+    --color-ink: #eef1ef;
+    --color-ink-muted: #d3d9d6;
+    --color-ink-faint: #9aa39f;
+    --color-line: #2a302e;
+    --color-line-strong: #414946;
+    --color-accent: #3dbb9c;
+    --color-accent-hover: #5ccfb2;
+    --color-accent-soft: #163a31;
+    --color-on-accent: #04130e;
+    --color-danger: #f28b80;
+    --color-danger-soft: #3b1815;
+    --color-success: #5cd39a;
+    --shadow-raised: 0 6px 20px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.6);
+    --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23eef1ef' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  }
+}
+
+/* Dark palette chosen with the toggle (same values as above). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #121514;
+  --color-bg-translucent: rgba(18, 21, 20, 0.94);
+  --color-surface: #1b1f1e;
+  --color-surface-strong: #262b29;
+  --color-ink: #eef1ef;
+  --color-ink-muted: #d3d9d6;
+  --color-ink-faint: #9aa39f;
+  --color-line: #2a302e;
+  --color-line-strong: #414946;
+  --color-accent: #3dbb9c;
+  --color-accent-hover: #5ccfb2;
+  --color-accent-soft: #163a31;
+  --color-on-accent: #04130e;
+  --color-danger: #f28b80;
+  --color-danger-soft: #3b1815;
+  --color-success: #5cd39a;
+  --shadow-raised: 0 6px 20px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23eef1ef' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+}
+
+/* Slightly larger everything on laptop and desktop screens (rem-based sizes scale with this). */
+@media (min-width: 1024px) {
+  html {
+    font-size: 106.25%;
+  }
+}
+
+@media (min-width: 1600px) {
+  html {
+    font-size: 112.5%;
+  }
+}
