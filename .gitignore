@@ -15,3 +15,10 @@ backend/uploads/
 # Logs / OS
 *.log
 .DS_Store
+Thumbs.db
+
+# Build output / editors
+dist/
+coverage/
+.vscode/
+.idea/
