@@ -1,21 +1,37 @@
-const express = require('express');
-const multer = require('multer');
-const vehicleController = require('../Controllers/VehicleController');
+import express from 'express';
+import multer from 'multer';
+import crypto from 'crypto';
+import * as vehicleController from '../Controllers/VehicleController.js';
+import { requireAdmin, requireAuth } from '../Middlewares/Auth.js';
 
-const router = express.Router();
-
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+// Extension comes from the checked MIME type, never the uploaded name, so uploads can't be served as HTML.
+const IMAGE_EXTENSIONS = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+  'image/avif': '.avif',
+};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${crypto.randomUUID()}${IMAGE_EXTENSIONS[file.mimetype]}`),
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: MAX_IMAGE_BYTES },
+  fileFilter: (req, file, cb) => cb(null, file.mimetype in IMAGE_EXTENSIONS),
+});
 
+export default function vehicleRouter(auth) {
+  const router = express.Router();
+  const adminOnly = [requireAuth(auth), requireAdmin];
 
+  router.get('/', vehicleController.getAllVehicles);
+  router.post('/', adminOnly, upload.single('image'), vehicleController.createVehicle);
+  router.put('/:id', adminOnly, upload.single('image'), vehicleController.updateVehicle);
+  router.delete('/:id', adminOnly, vehicleController.deleteVehicle);
 
-router.get('/', vehicleController.getAllVehicles);
-router.post('/', upload.single('image'), vehicleController.createVehicle);
-router.put('/:id', upload.single('image'), vehicleController.updateVehicle);
-router.delete('/:id', vehicleController.deleteVehicle);
-
-module.exports = router;
+  return router;
+}

@@ -1,34 +1,25 @@
-const jwt = require('jsonwebtoken');
-const UserModel = require('../Models/User');
+import { fromNodeHeaders } from 'better-auth/node';
 
-
-const ensureAuthenticated = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  
-  if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
-  }
-
+/** Loads the signed-in user from the session cookie into req.user, or answers 401. */
+export const requireAuth = (auth) => async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-    req.user = decoded; 
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Token is not valid' });
-  }
-};
-
-
-const authenticateAdmin = async (req, res, next) => {
-  try {
-    const user = await UserModel.findById(req.user._id);
-    if (!user || !user.isAdmin) {
-      return res.status(403).json({ message: 'Access denied: Admins only', success: false });
+    const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
+    if (!session) {
+      return res.status(401).json({ message: 'Log in to continue.', success: false });
     }
+    req.user = session.user;
     next();
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error!", success: false });
+    next(error);
   }
 };
 
-module.exports = { ensureAuthenticated, authenticateAdmin };
+const isAdmin = (user) => String(user?.role ?? '').split(',').map((r) => r.trim()).includes('admin');
+
+/** Use after requireAuth. Answers 403 unless the signed-in user has the admin role. */
+export const requireAdmin = (req, res, next) => {
+  if (!isAdmin(req.user)) {
+    return res.status(403).json({ message: 'Access denied: Admins only', success: false });
+  }
+  next();
+};

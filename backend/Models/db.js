@@ -1,8 +1,5 @@
-const dns = require('dns');
-const mongoose = require('mongoose');
-require("dotenv").config();
-
-const mongo_url = process.env.URI;
+import dns from 'dns';
+import mongoose from 'mongoose';
 
 // Optional: comma-separated DNS servers for resolving mongodb+srv:// records,
 // for machines where Node's default resolver refuses SRV lookups.
@@ -10,13 +7,12 @@ if (process.env.DNS_SERVERS) {
     dns.setServers(process.env.DNS_SERVERS.split(',').map((s) => s.trim()));
 }
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect(mongo_url, );
-        console.log(` MongoDB Connected to database: ${mongoose.connection.name}`);
-    } catch (err) {
-        console.error(" MongoDB Connection Error:", err);
-    }
+/** Connects Mongoose to MongoDB. Throws when the connection fails. */
+const connectDB = async (uri = process.env.URI) => {
+    if (!uri) throw new Error('URI is not set. Add your MongoDB connection string to backend/.env.');
+    await mongoose.connect(uri);
+    console.log(` MongoDB Connected to database: ${mongoose.connection.name}`);
+    return mongoose.connection;
 };
 
-module.exports = connectDB;
+export default connectDB;

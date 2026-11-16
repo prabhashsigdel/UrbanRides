@@ -1,36 +1,15 @@
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const fs = require('fs');
-
-const authRouter = require('./Routes/AuthRouter');
-const vehicleRoutes = require('./Routes/VehicleRouter');
-const connectDB = require('./Models/db');
-const bookingRoutes = require('./Routes/BookingRouter');
-
-require('dotenv').config();
-connectDB();
-
-
-const uploadDir = './uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
-
-
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-};
-app.use(cors(corsOptions));
-
-app.use(bodyParser.json());
-app.use('/auth', authRouter);
-app.use('/api/vehicles', vehicleRoutes);
-app.use('/uploads', express.static('uploads'));
-app.use('/api/bookings', bookingRoutes);
+import 'dotenv/config';
+import connectDB from './Models/db.js';
+import { createAuth } from './lib/auth.js';
+import { createApp } from './app.js';
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+try {
+  const connection = await connectDB();
+  const auth = createAuth({ db: connection.db, client: connection.getClient() });
+  createApp(auth).listen(PORT, () => console.log(`Server running on port ${PORT}`));
+} catch (error) {
+  console.error(' Failed to start:', error.message);
+  process.exit(1);
+}
