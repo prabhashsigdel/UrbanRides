@@ -4,7 +4,10 @@ import { body, validationResult } from 'express-validator';
 import Booking from '../Models/Booking.js';
 import Vehicle from '../Models/Vehicle.js';
 import { requireAuth } from '../Middlewares/Auth.js';
+import { rateLimitPerUser } from '../lib/rateLimit.js';
 
+const BOOKINGS_PER_HOUR = 10;
+const HOUR_MS = 60 * 60 * 1000;
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const PHONE_PATTERN = /^\+?[\d\s-]{7,16}$/;
 
@@ -29,11 +32,44 @@ const bookingValidation = [
   },
 ];
 
+/**
+ * Runs `task` after every earlier task for the same key has finished. Bookings for one vehicle are
+ * checked and saved one at a time, so two requests can't both pass the overlap check.
+ * Only holds within one server process.
+ */
+const vehicleQueues = new Map();
+function oneAtATime(key, task) {
+  const previous = vehicleQueues.get(key) ?? Promise.resolve();
+  const run = previous.then(task, task);
+  const tail = run.catch(() => {});
+  vehicleQueues.set(key, tail);
+  tail.then(() => vehicleQueues.get(key) === tail && vehicleQueues.delete(key));
+  return run;
+}
+
+/**
+ * Overlap is by calendar day: a vehicle returned on the 12th can't be picked up by someone else on the
+ * 12th, which leaves the day for the handover. Dates are stored at midnight UTC.
+ */
+function findOverlappingBooking(vehicleId, pickupDate, returnDate) {
+  return Booking.findOne({
+    vehicleId,
+    pickupDate: { $lte: new Date(returnDate) },
+    returnDate: { $gte: new Date(pickupDate) },
+  });
+}
+
 export default function bookingRouter(auth) {
   const router = express.Router();
   router.use(requireAuth(auth));
 
-  router.post('/', bookingValidation, async (req, res) => {
+  const limitBookings = rateLimitPerUser({
+    windowMs: HOUR_MS,
+    max: BOOKINGS_PER_HOUR,
+    message: "You've made a lot of bookings in the last hour. Please try again later.",
+  });
+
+  router.post('/', limitBookings, bookingValidation, async (req, res) => {
     try {
       const vehicle = await Vehicle.findById(req.body.vehicleId);
       if (!vehicle) {
@@ -43,17 +79,24 @@ export default function bookingRouter(auth) {
         return res.status(409).json({ message: "This vehicle isn't available right now" });
       }
 
-      const booking = await Booking.create({
-        userId: req.user.id,
-        vehicleId: vehicle._id,
-        pickupLocation: req.body.pickupLocation,
-        pickupDate: req.body.pickupDate,
-        pickupTime: req.body.pickupTime,
-        returnLocation: req.body.returnLocation,
-        returnDate: req.body.returnDate,
-        returnTime: req.body.returnTime,
-        phoneNumber: req.body.phoneNumber,
+      const booking = await oneAtATime(String(vehicle._id), async () => {
+        const clash = await findOverlappingBooking(vehicle._id, req.body.pickupDate, req.body.returnDate);
+        if (clash) return null;
+        return Booking.create({
+          userId: req.user.id,
+          vehicleId: vehicle._id,
+          pickupLocation: req.body.pickupLocation,
+          pickupDate: req.body.pickupDate,
+          pickupTime: req.body.pickupTime,
+          returnLocation: req.body.returnLocation,
+          returnDate: req.body.returnDate,
+          returnTime: req.body.returnTime,
+          phoneNumber: req.body.phoneNumber,
+        });
       });
+      if (!booking) {
+        return res.status(409).json({ message: 'This vehicle is already booked for some of those dates. Try different dates.' });
+      }
       res.status(201).json(booking);
     } catch (error) {
       if (error.name === 'ValidationError') {

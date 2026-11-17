@@ -3,6 +3,7 @@ import multer from 'multer';
 import crypto from 'crypto';
 import * as vehicleController from '../Controllers/VehicleController.js';
 import { requireAdmin, requireAuth } from '../Middlewares/Auth.js';
+import { UPLOAD_DIR } from '../lib/uploads.js';
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 // Extension comes from the checked MIME type, never the uploaded name, so uploads can't be served as HTML.
@@ -15,7 +16,7 @@ const IMAGE_EXTENSIONS = {
 };
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => cb(null, `${Date.now()}-${crypto.randomUUID()}${IMAGE_EXTENSIONS[file.mimetype]}`),
 });
 const upload = multer({

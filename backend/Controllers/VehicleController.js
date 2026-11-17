@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Vehicle from '../Models/Vehicle.js';
+import { deleteUpload } from '../lib/uploads.js';
 
 /** Copies only the fields an admin may set, so request bodies can't write anything else. */
 function vehicleFields(body, file) {
@@ -9,6 +10,13 @@ function vehicleFields(body, file) {
   if (body.pricePerDay !== undefined) fields.pricePerDay = Number(body.pricePerDay);
   if (body.available !== undefined) fields.available = body.available === true || body.available === 'true';
   if (file) fields.image = file.filename;
+  // Specs are optional: a blank value clears the field instead of saving 0 or "".
+  for (const key of ['seats', 'mileage']) {
+    if (body[key] !== undefined) fields[key] = body[key] === '' || body[key] === null ? undefined : Number(body[key]);
+  }
+  for (const key of ['transmission', 'fuel']) {
+    if (body[key] !== undefined) fields[key] = body[key] || undefined;
+  }
   return fields;
 }
 
@@ -32,6 +40,7 @@ export const createVehicle = async (req, res) => {
     await vehicle.save();
     res.status(201).json(vehicle);
   } catch (error) {
+    await deleteUpload(req.file?.filename);
     if (error.name === 'ValidationError') {
       return res.status(400).json({ message: error.message });
     }
@@ -44,21 +53,21 @@ export const createVehicle = async (req, res) => {
 export const updateVehicle = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!isValidId(id)) {
+    const vehicle = isValidId(id) ? await Vehicle.findById(id) : null;
+    if (!vehicle) {
+      await deleteUpload(req.file?.filename);
       return res.status(404).json({ message: "Vehicle not found" });
     }
 
-    const updatedVehicle = await Vehicle.findByIdAndUpdate(id, vehicleFields(req.body, req.file), {
-      new: true,
-      runValidators: true,
-    });
+    const previousImage = vehicle.image;
+    vehicle.set(vehicleFields(req.body, req.file));
+    await vehicle.save();
+    // The new photo is saved, so the one it replaced is no longer referenced.
+    if (req.file && previousImage !== vehicle.image) await deleteUpload(previousImage);
 
-    if (!updatedVehicle) {
-      return res.status(404).json({ message: "Vehicle not found" });
-    }
-
-    res.status(200).json(updatedVehicle);
+    res.status(200).json(vehicle);
   } catch (error) {
+    await deleteUpload(req.file?.filename);
     if (error.name === 'ValidationError' || error.name === 'CastError') {
       return res.status(400).json({ message: error.message });
     }
@@ -77,6 +86,7 @@ export const deleteVehicle = async (req, res) => {
       return res.status(404).json({ message: "Vehicle not found" });
     }
 
+    await deleteUpload(deletedVehicle.image);
     res.status(200).json({ message: "Vehicle deleted successfully" });
   } catch (error) {
     console.error('Error deleting vehicle:', error);

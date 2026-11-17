@@ -14,4 +14,7 @@ const bookingSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// Serves the overlap check run before every new booking.
+bookingSchema.index({ vehicleId: 1, pickupDate: 1, returnDate: 1 });
+
 export default mongoose.model('Booking', bookingSchema);

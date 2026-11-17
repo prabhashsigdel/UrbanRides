@@ -1,12 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { toNodeHandler } from 'better-auth/node';
 import vehicleRouter from './Routes/VehicleRouter.js';
 import bookingRouter from './Routes/BookingRouter.js';
+import adminRouter from './Routes/AdminRouter.js';
+import accountRouter from './Routes/AccountRouter.js';
 import { clientOrigins } from './lib/auth.js';
+import { UPLOAD_DIR as uploadDir } from './lib/uploads.js';
 
-const uploadDir = './uploads';
+// The Vite build. When it exists, the site and the API are served from one origin.
+const FRONTEND_DIST = process.env.FRONTEND_DIST
+  || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../frontend/dist');
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 /**
@@ -19,6 +26,16 @@ function rejectUntrustedOrigins(allowed) {
     if (SAFE_METHODS.has(req.method) || !origin || allowed.includes(origin)) return next();
     res.status(403).json({ message: 'Request origin not allowed' });
   };
+}
+
+/** Serves the built frontend, and its index.html for client-side routes like /my-orders. */
+function serveFrontend(app) {
+  // Vite fingerprints everything in assets/, so those files can be cached for good.
+  app.use('/assets', express.static(path.join(FRONTEND_DIST, 'assets'), { immutable: true, maxAge: '1y' }));
+  app.use(express.static(FRONTEND_DIST, { index: false }));
+  app.get(/^(?!\/(api|uploads)\/).*/, (req, res) => {
+    res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+  });
 }
 
 /** Builds the Express app around a Better Auth instance (see lib/auth.js). */
@@ -43,9 +60,15 @@ export function createApp(auth) {
   app.use(express.json());
   app.use('/api/vehicles', vehicleRouter(auth));
   app.use('/api/bookings', bookingRouter(auth));
+  app.use('/api/admin', adminRouter(auth));
+  app.use('/api/account', accountRouter(auth));
   app.use('/uploads', express.static(uploadDir, {
     setHeaders: (res) => res.setHeader('X-Content-Type-Options', 'nosniff'),
   }));
+
+  if (fs.existsSync(path.join(FRONTEND_DIST, 'index.html'))) {
+    serveFrontend(app);
+  }
 
   app.use((req, res) => res.status(404).json({ message: 'Not found' }));
 
