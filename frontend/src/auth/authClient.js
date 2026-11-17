@@ -1,8 +1,11 @@
 import { createAuthClient } from "better-auth/react";
+import { adminClient } from "better-auth/client/plugins";
 import { API_URL } from "../lib/api";
 
 export const authClient = createAuthClient({
   baseURL: API_URL || window.location.origin,
+  // authClient.admin.*: list users, set roles, ban. The server checks the admin role on each call.
+  plugins: [adminClient()],
 });
 
 /** Better Auth stores roles as a comma-separated string, e.g. "user" or "admin". */

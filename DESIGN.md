@@ -40,10 +40,13 @@ The accent is only for actions and focus. State is never shown by colour alone: 
 - **Navbar:** sticky white bar with the wordmark left and Cars, Bikes, About, Contact on the right. Log in and Sign up show when signed out, an avatar account menu when signed in. Below 820px it becomes a full-screen menu.
 - **SearchBar:** pill with All/Cars/Bikes chips, Pickup and Return dates, and a Search button. It stacks into a card below 860px. `showType={false}` gives a dates-only version for the vehicles page.
 - **TypeTabs:** text tabs with a GSAP-sliding underline.
-- **VehicleCard:** 4:3 photo (or an icon placeholder), model, type and price per day. The whole card links to booking. Unavailable cards are dimmed with a label and don't link.
+- **VehicleCard:** 4:3 photo (or an icon placeholder), model, type, a one-line spec reading when the admin has entered specs ("5 seats · Manual · Petrol"), and price per day. The whole card links to booking. Unavailable cards are dimmed with a label and don't link.
 - **StateBlock:** dashed-outline empty and error state with an optional action.
-- **Booking:** form sections (Pickup, Return, Contact) beside a sticky summary card showing the estimated total.
+- **Booking:** form sections (Pickup, Return, Contact) beside a sticky summary card showing the estimated total. Above the price lines, a 2×2 grid of spec tiles (seats, gearbox, fuel, mileage or range) on the surface colour with accent icons. Specs are optional fields the admin fills in; anything missing is left out, never guessed.
 - **Lists** (My bookings, Admin fleet): divider-separated rows rather than cards. Destructive actions confirm inline (Keep / Yes, cancel).
+- **Admin shell:** section nav (Overview, Bookings, Fleet, Users) in a 216px sticky sidebar with an accent-soft marker that glides to the active item (GSAP, 0.45s `power3.out`). Below 980px it becomes a sticky, horizontally scrolling pill row. The section lives in `?tab=`. The working area is a CSS container (`admin-main`), so panels respond to the space beside the nav, not the window.
+- **Overview:** one bordered figure strip (lead figure is takings this month in the accent, then on the road, upcoming, customers), then hairline-bordered panels on a 12-column grid: takings by month (area chart), fleet today, new bookings (bar chart), next pickups.
+- **Charts** (`components/charts`): hand-drawn SVG, one series each, in the accent, so no legend. 4px rounded bar tops on a square baseline, 2px line, recessive grid, compact en-IN axis labels (50K, 1.5L), ink tooltip with the full value on hover, an honest empty note when there is no data. Bars grow and the line draws in once on mount. The fleet split uses one labelled bar per state rather than colour-coded categories, because teal and grey shades fail colour-blind separation.
 
 ## Motion
 

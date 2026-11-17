@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { CalendarCheck, ChevronDown, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { CalendarCheck, ChevronDown, LogOut, Menu, UserRound, X } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import ThemeToggle from "./ThemeToggle";
 import { gsap, prefersReducedMotion } from "../lib/motion";
@@ -12,6 +12,7 @@ const LINKS = [
   { to: "/about-us", label: "About" },
   { to: "/contact-us", label: "Contact" },
 ];
+const ADMIN_LINKS = new Set(["/cars", "/bikes"]);
 
 function useDismiss(ref, isOpen, onClose) {
   useEffect(() => {
@@ -67,14 +68,21 @@ function AccountMenu({ onNavigate }) {
         <ChevronDown size={16} aria-hidden="true" />
       </button>
       <div className="account-menu" role="menu" data-open={isOpen}>
-        <Link role="menuitem" to="/my-orders" onClick={go}>
-          <CalendarCheck size={18} aria-hidden="true" /> My bookings
-        </Link>
-        {isAdmin && (
-          <Link role="menuitem" to="/admin" onClick={go}>
-            <LayoutDashboard size={18} aria-hidden="true" /> Manage fleet
+        <div className="account-menu-head" role="presentation">
+          <strong>{user?.name}</strong>
+          <span>{user?.email}</span>
+        </div>
+        {/* Admins run the site rather than rent from it, so they don't get My bookings. */}
+        {!isAdmin && (
+          <Link role="menuitem" to="/my-orders" onClick={go}>
+            <CalendarCheck size={18} aria-hidden="true" /> My bookings
           </Link>
         )}
+        {/* Password and account deletion live further down the same page. */}
+        <Link role="menuitem" to="/account" onClick={go}>
+          <UserRound size={18} aria-hidden="true" /> Edit profile
+        </Link>
+        <hr className="account-menu-sep" />
         <button role="menuitem" type="button" onClick={handleLogout}>
           <LogOut size={18} aria-hidden="true" /> Log out
         </button>
@@ -84,7 +92,9 @@ function AccountMenu({ onNavigate }) {
 }
 
 export default function Navbar() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
+  // Admins get their dashboard plus the fleet pages to check how vehicles look; About and Contact are for customers.
+  const links = isAdmin ? [{ to: "/admin", label: "Dashboard" }, ...LINKS.filter((l) => ADMIN_LINKS.has(l.to))] : LINKS;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -146,7 +156,7 @@ export default function Navbar() {
 
         <ul className="nav-links" ref={linksRef} onMouseLeave={hideHighlight}>
           <li className="nav-highlight" ref={highlightRef} aria-hidden="true" />
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <li key={link.to}>
               <NavLink
                 to={link.to}
@@ -188,7 +198,7 @@ export default function Navbar() {
 
       <div id="mobile-menu" className="mobile-menu" hidden={!isMenuOpen}>
         <ul>
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <li key={link.to}>
               <NavLink to={link.to} className="mobile-link" onClick={closeMenu}>
                 {link.label}

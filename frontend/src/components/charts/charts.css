@@ -1,0 +1,111 @@
+.chart {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.chart svg {
+  display: block;
+  overflow: visible;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-grid line {
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.chart-grid text,
+.chart-axis {
+  fill: var(--color-ink-faint);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chart-bar {
+  fill: var(--color-accent);
+  transition: opacity var(--duration-fast) ease;
+}
+
+.chart-bar[data-dim="true"] {
+  opacity: 0.35;
+}
+
+.chart-hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-area-stop {
+  stop-color: var(--color-accent);
+}
+
+.chart-crosshair {
+  stroke: var(--color-line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+/* Surface ring so the marker reads on top of the line. */
+.chart-dot {
+  fill: var(--color-accent);
+  stroke: var(--color-bg);
+  stroke-width: 2;
+}
+
+.chart-tooltip {
+  position: absolute;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-ink);
+  color: var(--color-bg);
+  box-shadow: var(--shadow-pop);
+  pointer-events: none;
+  animation: chart-tooltip-in 140ms var(--ease-out);
+}
+
+.chart-tooltip span {
+  font-size: var(--text-xs);
+  opacity: 0.75;
+}
+
+.chart-tooltip strong {
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.chart-empty {
+  position: absolute;
+  inset: 0 0 28px 40px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  pointer-events: none;
+}
+
+@keyframes chart-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-tooltip {
+    animation: none;
+  }
+}

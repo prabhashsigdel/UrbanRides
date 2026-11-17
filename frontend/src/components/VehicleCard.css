@@ -65,6 +65,15 @@
   color: var(--color-ink-muted);
 }
 
+.vehicle-specs {
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
 .vehicle-price {
   margin-top: var(--space-1);
   color: var(--color-ink-muted);

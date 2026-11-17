@@ -8,6 +8,7 @@ import StateBlock from "../components/StateBlock";
 import { api, errorMessage } from "../lib/api";
 import { addDaysInput, formatDate, formatRs, rentalDays, todayInput, typeLabel } from "../lib/format";
 import { EASE_OUT, gsap, prefersReducedMotion, useGSAP } from "../lib/motion";
+import { vehicleSpecs } from "../lib/specs";
 import "./Booking.css";
 
 const PHONE_PATTERN = /^\+?[\d\s-]{7,16}$/;
@@ -64,6 +65,7 @@ export default function Booking() {
   const vehicle = useMemo(() => vehicles.find((v) => v._id === vehicleId), [vehicles, vehicleId]);
   const days = rentalDays(form.pickupDate, form.returnDate);
   const total = vehicle ? days * Number(vehicle.pricePerDay) : 0;
+  const specs = vehicle ? vehicleSpecs(vehicle) : [];
 
   useGSAP(
     () => {
@@ -218,6 +220,19 @@ export default function Booking() {
                   <h2>{vehicle.model}</h2>
                   <p className="summary-type">{typeLabel(vehicle.type)}</p>
                 </div>
+                {specs.length > 0 && (
+                  <ul className="summary-specs" aria-label="Vehicle details">
+                    {specs.map(({ key, icon: Icon, value, label }) => (
+                      <li key={key}>
+                        <Icon size={18} aria-hidden="true" />
+                        <span>
+                          <strong className="tabular">{value}</strong>
+                          <span>{label}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 <dl className="summary-lines tabular">
                   <div>
                     <dt>Price per day</dt>

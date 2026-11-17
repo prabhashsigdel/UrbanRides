@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Bike, CarFront } from "lucide-react";
 import { imageUrl } from "../lib/api";
 import { formatRs, typeLabel } from "../lib/format";
+import { vehicleSpecs } from "../lib/specs";
 import "./VehicleCard.css";
 
 export function VehiclePhoto({ vehicle, className = "" }) {
@@ -23,6 +24,8 @@ export function VehiclePhoto({ vehicle, className = "" }) {
 /** One vehicle in the fleet grid. `search` carries chosen dates into the booking page. */
 export default function VehicleCard({ vehicle, search = "" }) {
   const isAvailable = vehicle.available !== false;
+  // Short readings only ("5 seats · Manual · Petrol"); mileage waits for the booking page.
+  const specs = vehicleSpecs(vehicle).filter((s) => s.key !== "mileage");
   const body = (
     <>
       <VehiclePhoto vehicle={vehicle} />
@@ -31,6 +34,7 @@ export default function VehicleCard({ vehicle, search = "" }) {
           <h3>{vehicle.model}</h3>
           <span className="vehicle-type">{typeLabel(vehicle.type)}</span>
         </div>
+        {specs.length > 0 && <p className="vehicle-specs">{specs.map((s) => s.value).join(" · ")}</p>}
         <p className="vehicle-price tabular">
           <strong>{formatRs(vehicle.pricePerDay)}</strong> per day
         </p>

@@ -1,0 +1,101 @@
+.account-page {
+  max-width: 600px;
+}
+
+.account-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.account-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  scroll-margin-top: calc(var(--nav-height) + var(--space-4));
+}
+
+.account-section h2,
+.account-methods h2 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.account-note {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.account-readonly {
+  margin: 0;
+  color: var(--color-ink-muted);
+}
+
+.account-methods {
+  padding: 0 var(--space-1);
+}
+
+.account-methods ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-methods li {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.account-section .field-error {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-danger);
+}
+
+.account-section .input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.account-danger {
+  border-color: color-mix(in srgb, var(--color-danger) 35%, var(--color-line));
+}
+
+.account-danger h2 {
+  color: var(--color-danger);
+}
+
+.account-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  animation: account-confirm-in 220ms var(--ease-out);
+}
+
+@keyframes account-confirm-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-confirm {
+    animation: none;
+  }
+}

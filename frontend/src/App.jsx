@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { BrowserRouter, Link, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AuthProvider } from "./auth/AuthContext";
+import { AuthProvider, useAuth } from "./auth/AuthContext";
 import RequireAuth from "./auth/RequireAuth";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -12,6 +12,7 @@ import Booking from "./pages/Booking";
 import Orders from "./pages/Orders";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import Account from "./pages/Account";
 import { About, Contact } from "./pages/Info";
 
 function ScrollToTop() {
@@ -20,6 +21,12 @@ function ScrollToTop() {
     window.scrollTo(0, 0);
   }, [pathname]);
   return null;
+}
+
+/** Admins land on their dashboard; everyone else gets the browse page. Cars and Bikes stay open to admins. */
+function HomeOrDashboard() {
+  const { isAdmin } = useAuth();
+  return isAdmin ? <Navigate to="/admin" replace /> : <Home />;
 }
 
 function NotFound() {
@@ -41,7 +48,7 @@ export default function App() {
         <ScrollToTop />
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomeOrDashboard />} />
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/cars" element={<Vehicles fixedType="car" />} />
           <Route path="/bikes" element={<Vehicles fixedType="bike" />} />
@@ -62,6 +69,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <Orders />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <RequireAuth>
+                <Account />
               </RequireAuth>
             }
           />
