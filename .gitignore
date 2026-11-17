@@ -37,6 +37,7 @@ backend/uploads/
 
 # Design tooling (AI-assisted design workspace)
 .impeccable/
+PRODUCT.md
 
 # Google OAuth client secret downloads
 client_secret*.json
